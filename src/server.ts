@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import {isImage} from './util/helper';
 
 (async () => {
 
@@ -13,6 +14,27 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
 
+  app.get( "/filteredimage", async ( req, res ) => {
+    const query = req.query;
+    const image_url = query.image_url;
+    if(!image_url){
+     return res.status(404).send("image path not found")
+    }
+    const is_image = await isImage(image_url);
+    if(!is_image){
+      return  res.status(403).send("Image path must be a valid image url")
+    }
+    await filterImageFromURL(image_url).then((r)=>{
+      const image_link = r;
+      console.log(image_link);
+        res.send("try GET /filteredimage?image_url={{}}")
+    }).catch(err=>{
+      res.status(422).send('Could not process image')
+    })
+    // console.log(filteredImage);
+    // res.send("try GET /filteredimage?image_url={{}}")
+  } );
+  
   // @TODO1 IMPLEMENT A RESTFUL ENDPOINT
   // GET /filteredimage?image_url={{URL}}
   // endpoint to filter an image from a public url.
