@@ -17,6 +17,7 @@ import {isImage} from './util/helper';
   app.get( "/filteredimage", async ( req, res ) => {
     const query = req.query;
     const image_url = query.image_url;
+    let files:any = [];
     if(!image_url){
      return res.status(404).send("image path not found")
     }
@@ -24,13 +25,17 @@ import {isImage} from './util/helper';
     if(!is_image){
       return  res.status(403).send("Image path must be a valid image url")
     }
-    await filterImageFromURL(image_url).then((r)=>{
-      const image_link = r;
-      console.log(image_link);
-        res.send("try GET /filteredimage?image_url={{}}")
+    await filterImageFromURL(image_url).then((image_link)=>{
+        res.sendFile(image_link,function(){
+          files.push(image_link)
+           deleteLocalFiles(files);
+        })
+        
+        // deleteLocalFiles(files);
     }).catch(err=>{
       res.status(422).send('Could not process image')
     })
+  
     // console.log(filteredImage);
     // res.send("try GET /filteredimage?image_url={{}}")
   } );
