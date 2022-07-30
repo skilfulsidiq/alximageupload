@@ -14,9 +14,9 @@ import {isImage} from './util/helper';
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
 
-  app.get( "/filteredimage", async ( req, res ) => {
+  app.get( "/filteredimage", async ( req:express.Request, res:express.Response ) => {
     const query = req.query;
-    const image_url = query.image_url;
+    const image_url:string = query.image_url;
     let files:any = [];
     if(!image_url){
      return res.status(404).send("image path not found")
